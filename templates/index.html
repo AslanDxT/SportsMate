@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}SportsMate - Find Your Sports Community{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <span class="eyebrow">YOUR LOCAL SPORTS COMMUNITY</span>
+        <h1>Find people.<br>Play sports.<br><span>Stay active.</span></h1>
+        <p>SportsMate helps you find people nearby who want to play the same sports as you.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('register') }}" class="btn">Find a SportsMate</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+        </div>
+    </div>
+    <div class="hero-card">
+        <div class="hero-ball">
+            <svg class="app-icon" style="width: 80px; height: 80px; stroke: var(--cta-primary);" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20"/><path d="M2 12h20"/></svg>
+        </div>
+        <h3>Your next game is closer than you think.</h3>
+        <p>Discover activities and meet people who enjoy the same sports.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <span class="eyebrow">HOW IT WORKS</span>
+        <h2>Simple from the start.</h2>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card">
+            <div class="feature-icon">01</div>
+            <h3>Create your profile</h3>
+            <p class="muted">Tell the community what sports you enjoy and what level you play.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon">02</div>
+            <h3>Find activities</h3>
+            <p class="muted">Search for sports activities based on sport, location and skill level.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon">03</div>
+            <h3>Meet your SportsMate</h3>
+            <p class="muted">Join activities, connect with people and start playing together.</p>
+        </article>
+    </div>
+</section>
+
+<section class="cta-section">
+    <h2>Ready to find your SportsMate?</h2>
+    <p>Create your free account and discover your local sports community.</p>
+    <a href="{{ url_for('register') }}" class="btn">Get Started</a>
+</section>
+{% endblock %}
