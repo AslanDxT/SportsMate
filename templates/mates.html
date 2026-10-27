@@ -1,10 +1,9 @@
-<!-- mates.html -->
 {% extends "base.html" %}
 
 {% block title %}Find SportsMates - SportsMate{% endblock %}
 
 {% block content %}
-<section class="page-header">
+<section class="page-header header-mates">
     <div>
         <span class="eyebrow">COMMUNITY</span>
         <h1>Find SportsMates</h1>
@@ -33,7 +32,6 @@
 <div class="people-grid">
     {% for user in users %}
     <article class="person-card">
-        
         <div class="person-header">
             <div class="avatar">
                 {{ user.name[0]|upper }}
@@ -70,10 +68,8 @@
                 Message
             </a>
         </div>
-
     </article>
     {% else %}
-    
     <div class="empty-state">
         <h3>No athletes found</h3>
         <p>Try adjusting your search filters or exploring a different location.</p>
@@ -81,7 +77,6 @@
             Browse Activities Instead
         </a>
     </div>
-    
     {% endfor %}
 </div>
 {% endblock %}

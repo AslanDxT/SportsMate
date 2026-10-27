@@ -10,8 +10,16 @@
 
     <section class="detail-card">
         <div class="activity-top">
-            <span class="sport-tag">{{ activity.sport_name }}</span>
-            <span class="skill-tag">{{ activity.skill_level }}</span>
+            <div class="activity-tags-group">
+                <span class="sport-tag">{{ activity.sport_name }}</span>
+                <span class="skill-tag">{{ activity.skill_level }}</span>
+            </div>
+            {% if joined %}
+            <span class="participation-badge">
+                <svg class="app-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                You're participating
+            </span>
+            {% endif %}
         </div>
 
         <h1>{{ activity.title }}</h1>

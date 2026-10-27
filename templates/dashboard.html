@@ -3,7 +3,7 @@
 {% block title %}Dashboard - SportsMate{% endblock %}
 
 {% block content %}
-<section class="page-header">
+<section class="page-header header-dashboard">
     <div>
         <span class="eyebrow">SPORTS COMMUNITY</span>
         <h1>Hey {{ current_user.name }}</h1>
@@ -15,14 +15,14 @@
 </section>
 
 <div class="quick-actions">
-    <a href="{{ url_for('activities') }}" class="quick-card">
+    <a href="{{ url_for('activities') }}" class="quick-card quick-card-discover">
         <span><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
         <div>
             <strong>Find Activities</strong>
             <small>Discover sports near you</small>
         </div>
     </a>
-    <a href="{{ url_for('mates') }}" class="quick-card">
+    <a href="{{ url_for('mates') }}" class="quick-card quick-card-mates">
         <span><svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
         <div>
             <strong>Find SportsMates</strong>
@@ -42,10 +42,21 @@
 
     <div class="card-grid">
         {% for activity in activities %}
-        <article class="activity-card">
+        {% set is_host = current_user and (activity.creator_id == current_user.id) %}
+        {% set user_joined = is_host or activity.is_joined or activity.joined or (current_user and activity.participant_ids and current_user.id in activity.participant_ids) %}
+
+        <article class="activity-card {% if user_joined %}is-participating{% endif %}">
             <div class="activity-top">
-                <span class="sport-tag">{{ activity.sport_name }}</span>
-                <span class="skill-tag">{{ activity.skill_level }}</span>
+                <div class="activity-tags-group">
+                    <span class="sport-tag">{{ activity.sport_name }}</span>
+                    <span class="skill-tag">{{ activity.skill_level }}</span>
+                </div>
+                {% if user_joined %}
+                <span class="participation-badge {% if is_host %}host-badge{% endif %}">
+                    <svg class="app-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {% if is_host %}Hosting{% else %}Joined{% endif %}
+                </span>
+                {% endif %}
             </div>
             <h3>{{ activity.title }}</h3>
             
@@ -60,8 +71,8 @@
                     <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     {{ activity.participant_count }}/{{ activity.max_participants }}
                 </span>
-                <a href="{{ url_for('activity_detail', activity_id=activity.id) }}" class="btn-small primary">View</a>
-                </div>
+                <a href="{{ url_for('activity_detail', activity_id=activity.id) }}" class="btn-small {% if not user_joined %}primary{% endif %}">View</a>
+            </div>
         </article>
         {% else %}
         <div class="empty-state">

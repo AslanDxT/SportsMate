@@ -245,13 +245,19 @@ def dashboard():
                 SELECT COUNT(*)
                 FROM activity_participants
                 WHERE activity_id = activities.id
-            ) AS participant_count
+            ) AS participant_count,
+            EXISTS(
+                SELECT 1
+                FROM activity_participants
+                WHERE activity_id = activities.id
+                AND user_id = ?
+            ) AS is_joined
         FROM activities
         JOIN sports ON activities.sport_id = sports.id
         JOIN users ON activities.creator_id = users.id
         ORDER BY activities.date, activities.time
         LIMIT 6
-    """).fetchall()
+    """, (session["user_id"],)).fetchall()
 
     db.close()
 
@@ -290,14 +296,20 @@ def activities():
                 SELECT COUNT(*)
                 FROM activity_participants
                 WHERE activity_id = activities.id
-            ) AS participant_count
+            ) AS participant_count,
+            EXISTS(
+                SELECT 1
+                FROM activity_participants
+                WHERE activity_id = activities.id
+                AND user_id = ?
+            ) AS is_joined
         FROM activities
         JOIN sports ON activities.sport_id = sports.id
         JOIN users ON activities.creator_id = users.id
         WHERE 1=1
     """
 
-    params = []
+    params = [session["user_id"]]
 
     if sport:
         query += " AND sports.name = ?"
@@ -670,37 +682,59 @@ def mates():
     if not login_required():
         return redirect(url_for("login"))
 
+    selected_location = request.args.get("location", "").strip()
+    selected_sport = request.args.get("sport", "").strip()
+
     db = get_db()
 
-    users = db.execute("""
-        SELECT *
+    all_sports = db.execute(
+        "SELECT * FROM sports ORDER BY name"
+    ).fetchall()
+
+    query = """
+        SELECT DISTINCT users.*
         FROM users
-        WHERE id != ?
-        ORDER BY name
-    """, (session["user_id"],)).fetchall()
+        LEFT JOIN user_sports ON users.id = user_sports.user_id
+        LEFT JOIN sports ON user_sports.sport_id = sports.id
+        WHERE users.id != ?
+    """
+    params = [session["user_id"]]
 
-    result = []
+    if selected_location:
+        query += " AND users.location LIKE ?"
+        params.append(f"%{selected_location}%")
 
-    for user in users:
+    if selected_sport:
+        query += " AND sports.name = ?"
+        params.append(selected_sport)
 
-        sports = db.execute("""
+    query += " ORDER BY users.name"
+
+    raw_users = db.execute(query, params).fetchall()
+
+    users_list = []
+
+    for row in raw_users:
+        user_dict = dict(row)
+        user_sports_rows = db.execute("""
             SELECT sports.name
             FROM sports
             JOIN user_sports
                 ON sports.id = user_sports.sport_id
             WHERE user_sports.user_id = ?
-        """, (user["id"],)).fetchall()
+        """, (row["id"],)).fetchall()
 
-        result.append({
-            "user": user,
-            "sports": [s["name"] for s in sports]
-        })
+        user_dict["sports"] = [{"name": s["name"]} for s in user_sports_rows]
+        users_list.append(user_dict)
 
     db.close()
 
     return render_template(
         "mates.html",
-        mates=result
+        users=users_list,
+        sports=all_sports,
+        selected_location=selected_location,
+        selected_sport=selected_sport
     )
 
 
